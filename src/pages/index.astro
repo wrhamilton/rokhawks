@@ -90,7 +90,7 @@ import Layout from '../layouts/Layout.astro';
   <script>
     const form = document.getElementById('concern-form');
     const status = document.getElementById('form-status');
-    const recipientEmail = 'admin@rokhawks.ca';
+    const recipientEmail = 'rokhawks@proton.me';
 
     const escapeHtml = (value = '') =>
       String(value).replace(/[&<>"']/g, (character) => ({
@@ -155,7 +155,7 @@ import Layout from '../layouts/Layout.astro';
       const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       window.location.href = mailtoLink;
 
-      status.textContent = 'Your email client is opening so your concern can be sent to admin@rokhawks.ca.';
+      status.textContent = 'Your email client is opening so your concern can be sent to rokhawks@proton.me.';
       status.hidden = false;
       status.classList.remove('error');
       form.reset();
