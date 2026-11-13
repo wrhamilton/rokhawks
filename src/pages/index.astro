@@ -1,0 +1,164 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <main class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Hyland Heights Elementary</p>
+        <h1>Respect Our Kids: Hawk Parent Action</h1>
+        <p class="subhead">Upper Grand District School Board</p>
+      </div>
+    </header>
+
+    <section class="content-grid">
+      <article class="story-panel">
+        <p class="lede">
+          We are parents of two students at Hyland Heights Elementary, and we are deeply concerned about the
+          administration’s lack of action to keep our kids safe after reporting bullying and a serious safety
+          incident involving another student’s parents on school grounds.
+        </p>
+
+        <p>
+          We are not speaking up lightly. We are speaking because our children deserve a safe school environment,
+          and because the response from administration has not matched the seriousness of what occurred. We are
+          aware of community discussions across local forums, including Facebook, that point to broader concern and
+          growing frustration with similar situations.
+        </p>
+
+        <p>
+          This is a call for brave parents to stand together and let their concerns be known. We are also seeking
+          interested families who want to organize as a parent group to push for change, greater accountability,
+          and stronger protections for students.
+        </p>
+
+        <div class="callout">
+          <h2>What we are asking for</h2>
+          <ul>
+            <li>Clear action on reported bullying and safety concerns</li>
+            <li>Stronger protections for children on school property</li>
+            <li>Accountability from school leadership</li>
+            <li>A united parent voice demanding meaningful change</li>
+          </ul>
+        </div>
+      </article>
+
+      <aside class="form-panel">
+        <div class="form-header">
+          <h2>Submit a concern</h2>
+          <p>Share your experience and let your concerns be heard.</p>
+        </div>
+
+        <form id="concern-form" novalidate>
+          <div class="field-row">
+            <label for="name">Name (optional)</label>
+            <input id="name" name="name" type="text" maxlength="250" autocomplete="name" />
+          </div>
+
+          <div class="field-row">
+            <label for="email">Email (optional)</label>
+            <input id="email" name="email" type="email" maxlength="250" autocomplete="email" />
+          </div>
+
+          <div class="field-row">
+            <label for="concerns">Your concerns with the administration</label>
+            <textarea
+              id="concerns"
+              name="concerns"
+              rows="10"
+              maxlength="25000"
+              required
+              aria-describedby="concerns-help"
+            ></textarea>
+            <small id="concerns-help">Please describe your concerns clearly. Maximum 25,000 characters.</small>
+          </div>
+
+          <label class="checkbox-row" for="organizer">
+            <input id="organizer" name="organizer" type="checkbox" required />
+            <span>I am interested in organizing with other parents as part of a parent group to demand change.</span>
+          </label>
+
+          <button type="submit">Submit concern</button>
+        </form>
+
+        <p id="form-status" class="form-status" role="status" aria-live="polite" hidden></p>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('concern-form');
+    const status = document.getElementById('form-status');
+    const recipientEmail = 'admin@rokhawks.ca';
+
+    const escapeHtml = (value = '') =>
+      String(value).replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[character]));
+
+    const sanitizeInput = (value = '') => {
+      const withoutScripts = String(value).replace(/<script[\s\S]*?<\/script>/gi, '');
+      return escapeHtml(withoutScripts).trim();
+    };
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      const name = sanitizeInput(formData.get('name') ?? '');
+      const email = sanitizeInput(formData.get('email') ?? '');
+      const concerns = sanitizeInput(formData.get('concerns') ?? '');
+      const interestedInOrganizing = formData.get('organizer') === 'on';
+
+      if (!concerns) {
+        status.textContent = 'Please share your concerns with the administration before submitting.';
+        status.hidden = false;
+        status.classList.add('error');
+        return;
+      }
+
+      if (concerns.length > 25000) {
+        status.textContent = 'Your concern must be 25,000 characters or fewer.';
+        status.hidden = false;
+        status.classList.add('error');
+        return;
+      }
+
+      if (!interestedInOrganizing) {
+        status.textContent = 'Please confirm whether you are interested in organizing with other parents.';
+        status.hidden = false;
+        status.classList.add('error');
+        return;
+      }
+
+      form.elements.name.value = name;
+      form.elements.email.value = email;
+      form.elements.concerns.value = concerns;
+
+      const subject = `Concern submission${name ? ` from ${name}` : ''}`;
+      const body = [
+        'Respect Our Kids: Hawk Parent Action',
+        '',
+        `Name: ${name || 'Not provided'}`,
+        `Email: ${email || 'Not provided'}`,
+        `Interested in organizing: ${interestedInOrganizing ? 'Yes' : 'No'}`,
+        '',
+        'Concerns with the administration:',
+        concerns
+      ].join('\n');
+
+      const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoLink;
+
+      status.textContent = 'Your email client is opening so your concern can be sent to admin@rokhawks.ca.';
+      status.hidden = false;
+      status.classList.remove('error');
+      form.reset();
+    });
+  </script>
+</Layout>
